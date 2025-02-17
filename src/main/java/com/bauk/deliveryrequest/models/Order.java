@@ -6,6 +6,8 @@ import java.util.Date;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.bauk.deliveryrequest.enums.OrderStatus;
+
 @Document
 public class Order implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -14,17 +16,17 @@ public class Order implements Serializable {
     private String id;
     private Integer quantity;
     private Date order_date;
-    private String status;
+    private OrderStatus status;
     private User customer;
 
     public Order() {
+        this.status = OrderStatus.PENDING;
     }
 
-    public Order(String id, Integer quantity, Date order_date, String status, User customer) {
+    public Order(String id, Integer quantity, Date order_date, User customer) {
         this.id = id;
         this.quantity = quantity;
         this.order_date = order_date;
-        this.status = status;
         this.customer = customer;
     }
 
@@ -52,20 +54,20 @@ public class Order implements Serializable {
         this.order_date = order_date;
     }
 
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
     public User getCustomer() {
         return customer;
     }
 
     public void setCustomer(User customer) {
         this.customer = customer;
+    }
+
+    public OrderStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(OrderStatus status) {
+        this.status = status;
     }
 
     @Override
