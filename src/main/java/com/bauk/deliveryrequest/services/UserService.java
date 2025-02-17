@@ -23,6 +23,10 @@ public class UserService {
         return userRepository.findById(id);
     }
 
+    public Optional<User> findUserByUsernameOrEmail(String nameOrEmail) {
+        return userRepository.findByNameOrEmail(nameOrEmail, nameOrEmail);
+    }
+
     public UserResponseDTO createUser(UserDto userDto) {
         User user = new User();
         user.setEmail(userDto.getEmail());
@@ -34,4 +38,15 @@ public class UserService {
 
         return new UserResponseDTO(savedUser);
     }
+
+    public UserResponseDTO authUser(UserDto userDto) {
+        Optional<User> user = userRepository.findByNameOrEmail(userDto.getName(), userDto.getEmail());
+        if (!user.isPresent()) {
+            throw new RuntimeException("User not found");
+        }
+
+        return new UserResponseDTO(user.get());
+
+    }
+
 }
