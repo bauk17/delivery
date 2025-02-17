@@ -1,6 +1,7 @@
 package com.bauk.deliveryrequest.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,5 +23,15 @@ public class UserController {
         UserResponseDTO newUser = userService.createUser(userDto);
 
         return ResponseEntity.ok(newUser);
+    }
+
+    @PostMapping("/auth")
+    public ResponseEntity<?> authUser(@RequestBody UserDto userDto) {
+        try {
+            UserResponseDTO user = userService.authUser(userDto);
+            return ResponseEntity.ok(user);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        }
     }
 }
