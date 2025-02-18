@@ -44,6 +44,9 @@ public class UserService {
         if (!user.isPresent()) {
             throw new RuntimeException("User not found");
         }
+        if (!passwordEncoder.matches(userDto.getPassword(), user.get().getPassword())) {
+            throw new RuntimeException("Invalid credentials");
+        }
 
         return new UserResponseDTO(user.get());
 
