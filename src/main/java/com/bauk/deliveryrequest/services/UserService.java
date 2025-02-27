@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import com.bauk.deliveryrequest.dto.AuthResponseDTO;
 import com.bauk.deliveryrequest.dto.UserDto;
 import com.bauk.deliveryrequest.dto.UserResponseDTO;
+import com.bauk.deliveryrequest.exceptions.ObjectAlreadyExistsException;
 import com.bauk.deliveryrequest.models.User;
 import com.bauk.deliveryrequest.repositories.UserRepository;
 import com.bauk.deliveryrequest.security.JwtTokenProvider;
@@ -43,6 +44,12 @@ public class UserService {
     }
 
     public UserResponseDTO createUser(UserDto userDto) {
+        User findUser = userRepository.findByNameOrEmail(userDto.getName(), userDto.getEmail());
+
+        if (findUser != null) {
+            throw new ObjectAlreadyExistsException("User already exists");
+        }
+
         User user = new User();
         user.setEmail(userDto.getEmail());
         user.setName(userDto.getName());
