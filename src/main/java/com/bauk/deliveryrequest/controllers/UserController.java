@@ -2,6 +2,7 @@ package com.bauk.deliveryrequest.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,7 +19,7 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @PostMapping
+    @PostMapping("/register")
     public ResponseEntity<UserResponseDTO> createUser(@RequestBody UserDto userDto) {
         UserResponseDTO newUser = userService.createUser(userDto);
 
@@ -30,4 +31,10 @@ public class UserController {
         AuthResponseDTO response = userService.authUser(userDto);
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/protected-route")
+    public ResponseEntity<?> protectedRoute() {
+        return ResponseEntity.ok().body("Protected route");
+    }
+
 }
