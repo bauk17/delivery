@@ -17,11 +17,11 @@ import io.jsonwebtoken.security.Keys;
 public class JwtTokenProvider {
     Dotenv dotenv = Dotenv.load();
     private final String JWT_KEY = dotenv.get("SECRET_KEY");
-    private final long EXPIRATION_TIME = 1000 * 60 * 60 * 60 * 30;
+    private final long EXPIRATION_TIME = 1000L * 60 * 60 * 24 * 30;
     private final Key key = Keys.hmacShaKeyFor(JWT_KEY.getBytes());
 
     public String generateToken(UserDetails userDetails) {
-        return Jwts.builder().setSubject(userDetails.getClass().getName())
+        return Jwts.builder().setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(key, SignatureAlgorithm.HS256).compact();
