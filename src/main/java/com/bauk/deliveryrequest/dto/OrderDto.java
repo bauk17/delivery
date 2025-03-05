@@ -3,12 +3,11 @@ package com.bauk.deliveryrequest.dto;
 import java.util.Date;
 
 import com.bauk.deliveryrequest.models.Order;
-import com.bauk.deliveryrequest.models.User;
 
 public class OrderDto {
     private Integer quantity;
     private Date order_date;
-    private User costumer;
+    private UserResponseDTO costumer;
 
     public OrderDto() {
         this.costumer = null;
@@ -30,7 +29,7 @@ public class OrderDto {
         return order_date;
     }
 
-    public User getCostumer() {
+    public UserResponseDTO getCostumer() {
         return costumer;
     }
 
