@@ -8,6 +8,7 @@ import com.bauk.deliveryrequest.repositories.OrderRepository;
 import com.bauk.deliveryrequest.repositories.UserRepository;
 
 @Configuration
+
 public class Instantiation implements CommandLineRunner {
 
     @Autowired
@@ -19,6 +20,6 @@ public class Instantiation implements CommandLineRunner {
     public void run(String... args) throws Exception {
         userRepository.deleteAll();
         orderRepository.deleteAll();
+        System.out.println("Everything setted up and serving is running");
     }
-
 }
