@@ -1,6 +1,7 @@
 package com.bauk.deliveryrequest.models;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.Date;
 
 import org.springframework.data.annotation.Id;
@@ -17,14 +18,16 @@ public class Order implements Serializable {
     private String id;
     private Integer quantity;
     private Date order_date;
+    private Instant updatedAt;
     private OrderStatus status;
     private UserResponseDTO customer;
+    private UserResponseDTO deliveryman;
 
     public Order() {
         this.status = OrderStatus.PENDING;
     }
 
-    public Order(String id, Integer quantity, Date order_date, UserResponseDTO customer) {
+    public Order(String id, Integer quantity, Date order_date, UserResponseDTO customer, UserResponseDTO deliveryman) {
         this.id = id;
         this.quantity = quantity;
         this.order_date = order_date;
