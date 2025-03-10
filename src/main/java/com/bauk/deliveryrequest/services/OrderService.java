@@ -1,5 +1,8 @@
 package com.bauk.deliveryrequest.services;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,7 +15,6 @@ import com.bauk.deliveryrequest.models.Order;
 import com.bauk.deliveryrequest.models.User;
 import com.bauk.deliveryrequest.repositories.OrderRepository;
 import com.bauk.deliveryrequest.repositories.UserRepository;
-import com.bauk.deliveryrequest.security.JwtTokenProvider;
 
 @Service
 public class OrderService {
@@ -23,33 +25,44 @@ public class OrderService {
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    private JwtTokenProvider jwtTokenProvider;
-
     public OrderDto createOrder(OrderDto orderDto) {
 
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String username;
+        String user;
         if (principal instanceof UserDetails) {
-            username = ((UserDetails) principal).getUsername();
+            user = ((UserDetails) principal).getUsername();
         } else {
-            username = principal.toString();
+            user = principal.toString();
         }
 
-        User user = userRepository.findByNameOrEmail(username, username);
+        User findUser = userRepository.findByNameOrEmail(user, user);
 
-        if (user == null) {
+        if (findUser == null) {
             throw new ObjectNotFoundException("User not found");
         }
 
-        UserResponseDTO userOrdering = new UserResponseDTO(user);
+        UserResponseDTO userOrdering = new UserResponseDTO(findUser);
 
         Order userOrder = new Order();
-        userOrder.setCustomer(userOrdering);
+        userOrder.setCustomerId(userOrdering.getId());
         userOrder.setOrder_date(orderDto.getOrder_date());
         userOrder.setQuantity(orderDto.getQuantity());
+        userOrder.setId(orderDto.getId());
+
         Order prevOrder = orderRepository.save(userOrder);
 
         return new OrderDto(prevOrder);
+    }
+
+    public Optional<Order> findOrderById(String orderId) {
+        return orderRepository.findById(orderId);
+    }
+
+    public List<Order> getUserOrders(String customerId) {
+        List<Order> orders = orderRepository.findByCustomerId(customerId);
+        if (orders.isEmpty()) {
+            throw new RuntimeException("Nenhum pedido encontrado para o cliente: " + customerId);
+        }
+        return orders;
     }
 }
