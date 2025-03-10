@@ -7,7 +7,6 @@ import java.util.Date;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.bauk.deliveryrequest.dto.UserResponseDTO;
 import com.bauk.deliveryrequest.enums.OrderStatus;
 
 @Document
@@ -20,18 +19,17 @@ public class Order implements Serializable {
     private Date order_date;
     private Instant updatedAt;
     private OrderStatus status;
-    private UserResponseDTO customer;
-    private UserResponseDTO deliveryman;
+    private String customerId;
 
     public Order() {
         this.status = OrderStatus.PENDING;
     }
 
-    public Order(String id, Integer quantity, Date order_date, UserResponseDTO customer, UserResponseDTO deliveryman) {
+    public Order(String id, Integer quantity, Date order_date, String customerId) {
         this.id = id;
         this.quantity = quantity;
         this.order_date = order_date;
-        this.customer = customer;
+        this.customerId = customerId;
     }
 
     public String getId() {
@@ -58,12 +56,12 @@ public class Order implements Serializable {
         this.order_date = order_date;
     }
 
-    public UserResponseDTO getCustomer() {
-        return customer;
+    public String getCustomerId() {
+        return customerId;
     }
 
-    public void setCustomer(UserResponseDTO customer) {
-        this.customer = customer;
+    public void setCustomerId(String customerId) {
+        this.customerId = customerId;
     }
 
     public OrderStatus getStatus() {
@@ -74,6 +72,10 @@ public class Order implements Serializable {
         this.status = status;
     }
 
+    public Instant getUpdatedAt() {
+        return updatedAt;
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -82,7 +84,7 @@ public class Order implements Serializable {
         result = prime * result + ((quantity == null) ? 0 : quantity.hashCode());
         result = prime * result + ((order_date == null) ? 0 : order_date.hashCode());
         result = prime * result + ((status == null) ? 0 : status.hashCode());
-        result = prime * result + ((customer == null) ? 0 : customer.hashCode());
+        result = prime * result + ((customerId == null) ? 0 : customerId.hashCode());
         return result;
     }
 
@@ -115,10 +117,10 @@ public class Order implements Serializable {
                 return false;
         } else if (!status.equals(other.status))
             return false;
-        if (customer == null) {
-            if (other.customer != null)
+        if (customerId == null) {
+            if (other.customerId != null)
                 return false;
-        } else if (!customer.equals(other.customer))
+        } else if (!customerId.equals(other.customerId))
             return false;
         return true;
     }
