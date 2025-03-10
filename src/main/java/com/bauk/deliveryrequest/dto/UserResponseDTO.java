@@ -7,6 +7,12 @@ public class UserResponseDTO {
     private String email;
     private String id;
 
+    public UserResponseDTO(String name, String email, String id) {
+        this.name = name;
+        this.email = email;
+        this.id = id;
+    }
+
     public UserResponseDTO(User user) {
         this.email = user.getEmail();
         this.id = user.getId();
