@@ -5,20 +5,23 @@ import java.util.Date;
 import com.bauk.deliveryrequest.models.Order;
 
 public class OrderDto {
+    private String id;
     private Integer quantity;
     private Date order_date;
-    private UserResponseDTO costumer;
+    private String costumerId;
 
     public OrderDto() {
-        this.costumer = null;
+        this.costumerId = null;
         this.quantity = null;
         this.order_date = null;
+        this.id = null;
     }
 
     public OrderDto(Order obj) {
-        this.costumer = obj.getCustomer();
+        this.costumerId = obj.getCustomerId();
         this.quantity = obj.getQuantity();
         this.order_date = obj.getOrder_date();
+        this.id = obj.getId();
     }
 
     public Integer getQuantity() {
@@ -29,8 +32,12 @@ public class OrderDto {
         return order_date;
     }
 
-    public UserResponseDTO getCostumer() {
-        return costumer;
+    public String getCostumer() {
+        return costumerId;
+    }
+
+    public String getId() {
+        return id;
     }
 
 }
