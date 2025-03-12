@@ -1,5 +1,6 @@
 package com.bauk.deliveryrequest.controllers;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.Optional;
 
@@ -57,7 +58,7 @@ public class OrderController {
 
     @GetMapping("/acceptOrder/{orderId}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Order> acceptOrder(@PathVariable String orderId) {
+    public ResponseEntity<Order> acceptOrder(@PathVariable String orderId) throws AccessDeniedException {
         Optional<Order> order = orderService.findOrderById(orderId);
         if (order.isPresent()) {
             Order acceptedOrder = orderService.acceptOrder(orderId);
