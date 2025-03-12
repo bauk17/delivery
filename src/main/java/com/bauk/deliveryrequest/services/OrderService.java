@@ -1,5 +1,6 @@
 package com.bauk.deliveryrequest.services;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,6 +17,7 @@ import com.bauk.deliveryrequest.models.Order;
 import com.bauk.deliveryrequest.models.User;
 import com.bauk.deliveryrequest.repositories.OrderRepository;
 import com.bauk.deliveryrequest.repositories.UserRepository;
+import com.bauk.deliveryrequest.security.SecurityUtil;
 
 @Service
 public class OrderService {
@@ -26,16 +28,13 @@ public class OrderService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private SecurityUtil securityUtil;
+
     public OrderDto createOrder(OrderDto orderDto) {
 
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String user;
-        if (principal instanceof UserDetails) {
-            user = ((UserDetails) principal).getUsername();
-        } else {
-            user = principal.toString();
-        }
-
+        String user = securityUtil.getAuthenticatedUsername();
+        System.out.print(user);
         User findUser = userRepository.findByNameOrEmail(user, user);
 
         if (findUser == null) {
@@ -67,8 +66,8 @@ public class OrderService {
         return orders;
     }
 
-    public Order acceptOrder(String orderId) {
-        Optional<Order> order = orderRepository.findById(orderId);
+    public Order acceptOrder(String orderId) throws AccessDeniedException {
+
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         String user;
@@ -80,16 +79,21 @@ public class OrderService {
 
         User findUser = userRepository.findByNameOrEmail(user, user);
 
-        if (findUser.getIsAdmin() == true) {
-            if (order.isPresent()) {
-                Order orderToAccept = order.get();
-                orderToAccept.setDeliveryManId(findUser.getId());
-                orderToAccept.setStatus(OrderStatus.PROCESSING);
-                return orderRepository.save(orderToAccept);
-            } else {
-                throw new ObjectNotFoundException("Order not found");
-            }
+        if (findUser == null) {
+            throw new ObjectNotFoundException("User not found");
         }
-        throw new RuntimeException("User is not an admin");
+
+        if (!findUser.getIsAdmin()) {
+            throw new AccessDeniedException("Access Denied");
+        }
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ObjectNotFoundException("Order not found"));
+
+        order.setDeliveryManId(findUser.getId());
+        order.setStatus(OrderStatus.PROCESSING);
+        return orderRepository.save(order);
+
     }
+
 }
