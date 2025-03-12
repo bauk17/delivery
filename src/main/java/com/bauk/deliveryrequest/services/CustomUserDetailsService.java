@@ -19,10 +19,12 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         User user = userRepository.findByNameOrEmail(usernameOrEmail, usernameOrEmail);
 
+        String role = user.getIsAdmin() ? "ADMIN" : "USER";
+
         return org.springframework.security.core.userdetails.User
                 .withUsername(user.getName())
                 .password(user.getPassword())
-                .roles("USER")
+                .roles(role)
                 .build();
     }
 }
