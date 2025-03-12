@@ -18,8 +18,7 @@ public class Instantiation implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        userRepository.deleteAll();
-        orderRepository.deleteAll();
+
         System.out.println("Everything setted up and serving is running");
     }
 }
