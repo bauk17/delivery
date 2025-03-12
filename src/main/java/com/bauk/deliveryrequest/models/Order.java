@@ -20,6 +20,7 @@ public class Order implements Serializable {
     private Instant updatedAt;
     private OrderStatus status;
     private String customerId;
+    private String deliveryManId;
 
     public Order() {
         this.status = OrderStatus.PENDING;
@@ -74,6 +75,14 @@ public class Order implements Serializable {
 
     public Instant getUpdatedAt() {
         return updatedAt;
+    }
+
+    public String getDeliveryManId() {
+        return deliveryManId;
+    }
+
+    public void setDeliveryManId(String deliveryManId) {
+        this.deliveryManId = deliveryManId;
     }
 
     @Override
