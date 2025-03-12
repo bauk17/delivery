@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -52,6 +53,18 @@ public class OrderController {
         List<Order> order = orderService.getUserOrders(userId);
 
         return ResponseEntity.ok().body(order);
+    }
+
+    @GetMapping("/acceptOrder/{orderId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Order> acceptOrder(@PathVariable String orderId) {
+        Optional<Order> order = orderService.findOrderById(orderId);
+        if (order.isPresent()) {
+            Order acceptedOrder = orderService.acceptOrder(orderId);
+            return ResponseEntity.ok().body(acceptedOrder);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
 }
