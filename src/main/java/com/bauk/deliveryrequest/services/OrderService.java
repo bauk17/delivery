@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.bauk.deliveryrequest.dto.OrderDto;
 import com.bauk.deliveryrequest.dto.UserResponseDTO;
+import com.bauk.deliveryrequest.enums.OrderStatus;
 import com.bauk.deliveryrequest.exceptions.ObjectNotFoundException;
 import com.bauk.deliveryrequest.models.Order;
 import com.bauk.deliveryrequest.models.User;
@@ -64,5 +65,31 @@ public class OrderService {
             throw new RuntimeException("Nenhum pedido encontrado para o cliente: " + customerId);
         }
         return orders;
+    }
+
+    public Order acceptOrder(String orderId) {
+        Optional<Order> order = orderRepository.findById(orderId);
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        String user;
+        if (principal instanceof UserDetails) {
+            user = ((UserDetails) principal).getUsername();
+        } else {
+            user = principal.toString();
+        }
+
+        User findUser = userRepository.findByNameOrEmail(user, user);
+
+        if (findUser.getIsAdmin() == true) {
+            if (order.isPresent()) {
+                Order orderToAccept = order.get();
+                orderToAccept.setDeliveryManId(findUser.getId());
+                orderToAccept.setStatus(OrderStatus.PROCESSING);
+                return orderRepository.save(orderToAccept);
+            } else {
+                throw new ObjectNotFoundException("Order not found");
+            }
+        }
+        throw new RuntimeException("User is not an admin");
     }
 }
