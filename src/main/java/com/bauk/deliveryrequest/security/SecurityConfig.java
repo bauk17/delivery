@@ -14,6 +14,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import com.bauk.deliveryrequest.security.exceptions.CustomAccessDeniedHandler;
+import com.bauk.deliveryrequest.security.exceptions.CustomAuthenticationEntryPoint;
 import com.bauk.deliveryrequest.services.CustomUserDetailsService;
 
 @Configuration
@@ -21,11 +23,17 @@ import com.bauk.deliveryrequest.services.CustomUserDetailsService;
 public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final CustomUserDetailsService userDetailsService;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
     public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter,
-            CustomUserDetailsService userDetailsService) {
+            CustomUserDetailsService userDetailsService,
+            CustomAuthenticationEntryPoint customAuthenticationEntryPoint,
+            CustomAccessDeniedHandler customAccessDeniedHandler) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         this.userDetailsService = userDetailsService;
+        this.customAuthenticationEntryPoint = customAuthenticationEntryPoint;
+        this.customAccessDeniedHandler = customAccessDeniedHandler;
     }
 
     @Bean
@@ -54,6 +62,9 @@ public class SecurityConfig {
                         .requestMatchers("/users/protected-route", "/order/newOrder").hasRole("USER")
                         .anyRequest()
                         .authenticated())
+                .exceptionHandling(exception -> exception.authenticationEntryPoint(customAuthenticationEntryPoint)
+                        .accessDeniedHandler(customAccessDeniedHandler))
+
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
