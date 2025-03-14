@@ -3,15 +3,16 @@ package com.bauk.deliveryrequest.services;
 import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import com.bauk.deliveryrequest.dto.OrderDto;
+import com.bauk.deliveryrequest.dto.StatusUpdateRequest;
 import com.bauk.deliveryrequest.dto.UserResponseDTO;
 import com.bauk.deliveryrequest.enums.OrderStatus;
+import com.bauk.deliveryrequest.exceptions.InvalidStatusException;
 import com.bauk.deliveryrequest.exceptions.ObjectNotFoundException;
 import com.bauk.deliveryrequest.models.Order;
 import com.bauk.deliveryrequest.models.User;
@@ -21,6 +22,13 @@ import com.bauk.deliveryrequest.security.SecurityUtil;
 
 @Service
 public class OrderService {
+
+    private static final Set<String> VALID_STATUSES = Set.of(
+            OrderStatus.PENDING.toString(),
+            OrderStatus.ACCEPTED.toString(),
+            OrderStatus.SHIPPED.toString(),
+            OrderStatus.DELIVERED.toString(),
+            OrderStatus.CANCELED.toString());
 
     @Autowired
     private OrderRepository orderRepository;
@@ -66,18 +74,16 @@ public class OrderService {
         return orders;
     }
 
-    public Order acceptOrder(String orderId) throws AccessDeniedException {
+    public Order updateOrderStatus(String orderId, StatusUpdateRequest status) throws AccessDeniedException {
 
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        String user;
-        if (principal instanceof UserDetails) {
-            user = ((UserDetails) principal).getUsername();
-        } else {
-            user = principal.toString();
-        }
+        String user = securityUtil.getAuthenticatedUsername();
 
         User findUser = userRepository.findByNameOrEmail(user, user);
+        System.out.printf("Pega o STATUS: %s\n", status.getStatus().name());
+
+        if (!VALID_STATUSES.contains(status.getStatus().name())) {
+            throw new InvalidStatusException("Invalid status");
+        }
 
         if (findUser == null) {
             throw new ObjectNotFoundException("User not found");
@@ -91,7 +97,7 @@ public class OrderService {
                 .orElseThrow(() -> new ObjectNotFoundException("Order not found"));
 
         order.setDeliveryManId(findUser.getId());
-        order.setStatus(OrderStatus.PROCESSING);
+        order.setStatus(status.getStatus());
         return orderRepository.save(order);
 
     }
