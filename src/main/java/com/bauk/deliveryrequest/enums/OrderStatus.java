@@ -2,7 +2,7 @@ package com.bauk.deliveryrequest.enums;
 
 public enum OrderStatus {
     PENDING,
-    PROCESSING,
+    ACCEPTED,
     SHIPPED,
     DELIVERED,
     CANCELED
