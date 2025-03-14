@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bauk.deliveryrequest.dto.OrderDto;
+import com.bauk.deliveryrequest.dto.StatusUpdateRequest;
 import com.bauk.deliveryrequest.models.Order;
 import com.bauk.deliveryrequest.repositories.OrderRepository;
 import com.bauk.deliveryrequest.services.OrderService;
@@ -28,13 +30,13 @@ public class OrderController {
     @Autowired
     private OrderRepository orderRepository;
 
-    @PostMapping("/newOrder")
+    @PostMapping
     public ResponseEntity<OrderDto> createOrder(@RequestBody OrderDto orderDto) {
         OrderDto newOrder = orderService.createOrder(orderDto);
         return ResponseEntity.ok(newOrder);
     }
 
-    @GetMapping("/findAll")
+    @GetMapping
     public ResponseEntity<List<Order>> findAllOrders() {
         return ResponseEntity.ok(orderRepository.findAll());
     }
@@ -49,19 +51,13 @@ public class OrderController {
         }
     }
 
-    @GetMapping("/myOrders/{userId}")
-    public ResponseEntity<List<Order>> getUserOrders(@PathVariable String userId) {
-        List<Order> order = orderService.getUserOrders(userId);
-
-        return ResponseEntity.ok().body(order);
-    }
-
-    @GetMapping("/acceptOrder/{orderId}")
+    @PatchMapping("/{orderId}/status")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Order> acceptOrder(@PathVariable String orderId) throws AccessDeniedException {
+    public ResponseEntity<Order> updateOrder(@PathVariable String orderId, @RequestBody StatusUpdateRequest status)
+            throws AccessDeniedException {
         Optional<Order> order = orderService.findOrderById(orderId);
         if (order.isPresent()) {
-            Order acceptedOrder = orderService.acceptOrder(orderId);
+            Order acceptedOrder = orderService.updateOrderStatus(orderId, status);
             return ResponseEntity.ok().body(acceptedOrder);
         } else {
             return ResponseEntity.notFound().build();
