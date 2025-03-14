@@ -1,5 +1,6 @@
 package com.bauk.deliveryrequest.controllers;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.bauk.deliveryrequest.dto.AuthResponseDTO;
 import com.bauk.deliveryrequest.dto.UserDto;
 import com.bauk.deliveryrequest.dto.UserResponseDTO;
+import com.bauk.deliveryrequest.models.Order;
 import com.bauk.deliveryrequest.models.User;
+import com.bauk.deliveryrequest.services.OrderService;
 import com.bauk.deliveryrequest.services.UserService;
 
 @RestController
@@ -23,7 +26,10 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @PostMapping("/register")
+    @Autowired
+    private OrderService orderService;
+
+    @PostMapping
     public ResponseEntity<UserResponseDTO> createUser(@RequestBody UserDto userDto) {
         UserResponseDTO newUser = userService.createUser(userDto);
 
@@ -36,11 +42,6 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/protected-route")
-    public ResponseEntity<?> protectedRoute() {
-        return ResponseEntity.ok().body("Protected route");
-    }
-
     @GetMapping("/{userId}")
     public ResponseEntity<User> getUserById(@PathVariable String userId) {
         Optional<User> user = userService.findUserById(userId);
@@ -51,6 +52,13 @@ public class UserController {
             return ResponseEntity.notFound().build();
         }
 
+    }
+
+    @GetMapping("/{userId}/orders")
+    public ResponseEntity<List<Order>> getUserOrders(@PathVariable String userId) {
+        List<Order> order = orderService.getUserOrders(userId);
+
+        return ResponseEntity.ok().body(order);
     }
 
 }
