@@ -54,9 +54,9 @@ public class UserController {
 
     }
 
-    @GetMapping("/{userId}/orders")
-    public ResponseEntity<List<Order>> getUserOrders(@PathVariable String userId) {
-        List<Order> order = orderService.getUserOrders(userId);
+    @GetMapping("/orders")
+    public ResponseEntity<List<Order>> getUserOrders() {
+        List<Order> order = orderService.getUserOrders();
 
         return ResponseEntity.ok().body(order);
     }
