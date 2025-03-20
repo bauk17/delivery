@@ -6,6 +6,8 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import com.bauk.deliveryrequest.dto.OrderDto;
@@ -66,11 +68,18 @@ public class OrderService {
         return orderRepository.findById(orderId);
     }
 
-    public List<Order> getUserOrders(String customerId) {
-        List<Order> orders = orderRepository.findByCustomerId(customerId);
-        if (orders.isEmpty()) {
-            throw new RuntimeException("Nenhum pedido encontrado para o cliente: " + customerId);
+    public List<Order> getUserOrders() {
+
+        String customer = securityUtil.getAuthenticatedUsername();
+
+        User findUser = userRepository.findByNameOrEmail(customer, customer);
+
+        if (findUser == null) {
+            throw new ObjectNotFoundException("User not found");
         }
+
+        List<Order> orders = orderRepository.findByCustomerId(findUser.getId());
+
         return orders;
     }
 
@@ -79,7 +88,6 @@ public class OrderService {
         String user = securityUtil.getAuthenticatedUsername();
 
         User findUser = userRepository.findByNameOrEmail(user, user);
-        System.out.printf("Pega o STATUS: %s\n", status.getStatus().name());
 
         if (!VALID_STATUSES.contains(status.getStatus().name())) {
             throw new InvalidStatusException("Invalid status");
@@ -99,6 +107,26 @@ public class OrderService {
         order.setDeliveryManId(findUser.getId());
         order.setStatus(status.getStatus());
         return orderRepository.save(order);
+
+    }
+
+    public void deleteOrder(String orderId) {
+
+        if (orderId == null || orderId.isEmpty()) {
+            throw new IllegalArgumentException("Order ID cannot be null or empty");
+        }
+
+        if (!orderRepository.existsById(orderId)) {
+            throw new ObjectNotFoundException("Order not found");
+        }
+
+        try {
+            orderRepository.deleteById(orderId);
+        } catch (EmptyResultDataAccessException e) {
+            throw new ObjectNotFoundException("Order not found with ID: " + orderId);
+        } catch (DataAccessException e) {
+            throw new RuntimeException("Failed to delete order due to a database error", e);
+        }
 
     }
 
