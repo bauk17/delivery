@@ -10,4 +10,5 @@ import com.bauk.deliveryrequest.models.Order;
 @Repository
 public interface OrderRepository extends MongoRepository<Order, String> {
     List<Order> findByCustomerId(String customerId);
+
 }
