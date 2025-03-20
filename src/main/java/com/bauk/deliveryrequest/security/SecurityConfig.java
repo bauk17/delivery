@@ -57,9 +57,10 @@ public class SecurityConfig {
                 authorize -> authorize.requestMatchers("/users/auth", "/users/**")
                         .permitAll()
 
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/admin/**", "/order/{orderId}").hasRole("ADMIN")
 
-                        .requestMatchers("/users/protected-route", "/order/newOrder").hasRole("USER")
+                        .requestMatchers("/users/protected-route", "/order/{orderId}").hasRole("USER")
+
                         .anyRequest()
                         .authenticated())
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(customAuthenticationEntryPoint)
