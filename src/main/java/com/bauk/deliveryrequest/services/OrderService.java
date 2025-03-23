@@ -16,11 +16,13 @@ import com.bauk.deliveryrequest.dto.UserResponseDTO;
 import com.bauk.deliveryrequest.enums.OrderStatus;
 import com.bauk.deliveryrequest.exceptions.InvalidStatusException;
 import com.bauk.deliveryrequest.exceptions.ObjectNotFoundException;
+import com.bauk.deliveryrequest.exceptions.UserIsNotOwnerException;
 import com.bauk.deliveryrequest.models.Order;
 import com.bauk.deliveryrequest.models.User;
 import com.bauk.deliveryrequest.repositories.OrderRepository;
 import com.bauk.deliveryrequest.repositories.UserRepository;
 import com.bauk.deliveryrequest.security.SecurityUtil;
+import com.bauk.deliveryrequest.utils.UserOwnershipUtil;
 
 @Service
 public class OrderService {
@@ -34,12 +36,12 @@ public class OrderService {
 
     @Autowired
     private OrderRepository orderRepository;
-
     @Autowired
     private UserRepository userRepository;
-
     @Autowired
     private SecurityUtil securityUtil;
+    @Autowired
+    private UserOwnershipUtil userOwnershipUtil;
 
     public OrderDto createOrder(OrderDto orderDto) {
 
@@ -111,6 +113,10 @@ public class OrderService {
     }
 
     public void deleteOrder(String orderId) {
+
+        if (!userOwnershipUtil.isUserOwner(orderId)) {
+            throw new UserIsNotOwnerException("User is not the owner of the order");
+        }
 
         if (orderId == null || orderId.isEmpty()) {
             throw new IllegalArgumentException("Order ID cannot be null or empty");
