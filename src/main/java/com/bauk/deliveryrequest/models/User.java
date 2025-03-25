@@ -15,6 +15,7 @@ public class User implements Serializable {
     @Indexed(unique = true)
     private String email;
 
+    @Indexed(unique = true)
     private String name;
 
     private String password;
