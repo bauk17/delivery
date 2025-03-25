@@ -8,4 +8,6 @@ import com.bauk.deliveryrequest.models.User;
 @Repository
 public interface UserRepository extends MongoRepository<User, String> {
     User findByNameOrEmail(String name, String email);
+
+    Boolean existsByNameOrEmail(String name, String email);
 }
