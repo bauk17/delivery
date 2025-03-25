@@ -2,6 +2,7 @@ package com.bauk.deliveryrequest.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -54,12 +55,14 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable).authorizeHttpRequests(
-                authorize -> authorize.requestMatchers("/users/auth", "/users/**")
+                authorize -> authorize.requestMatchers("/users/auth", "/users", "/swagger-ui/**", "/v3/api-docs/**")
                         .permitAll()
 
-                        .requestMatchers("/admin/**", "/order/{orderId}").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/users/{userId}", "/order/{orderId}",
+                                "/users/orders", "/order")
+                        .hasAnyRole("ADMIN", "USER")
 
-                        .requestMatchers("/users/protected-route", "/order/{orderId}").hasRole("USER")
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
 
                         .anyRequest()
                         .authenticated())
