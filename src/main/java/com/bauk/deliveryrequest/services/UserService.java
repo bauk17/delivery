@@ -44,9 +44,7 @@ public class UserService {
     }
 
     public UserResponseDTO createUser(UserDto userDto) {
-        User findUser = userRepository.findByNameOrEmail(userDto.getName(), userDto.getEmail());
-
-        if (findUser != null) {
+        if (userRepository.existsByNameOrEmail(userDto.getName(), userDto.getEmail())) {
             throw new ObjectAlreadyExistsException("User already exists");
         }
 
