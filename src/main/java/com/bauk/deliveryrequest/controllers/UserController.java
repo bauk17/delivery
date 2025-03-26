@@ -20,6 +20,9 @@ import com.bauk.deliveryrequest.models.User;
 import com.bauk.deliveryrequest.services.OrderService;
 import com.bauk.deliveryrequest.services.UserService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
 @RestController
 @RequestMapping(value = "/users")
 public class UserController {
@@ -29,6 +32,9 @@ public class UserController {
     @Autowired
     private OrderService orderService;
 
+    @Operation(summary = "Create a new user")
+    @ApiResponse(responseCode = "200", description = "Returns a UserResponseDTO")
+    @ApiResponse(responseCode = "409", description = "User already exists")
     @PostMapping
     public ResponseEntity<UserResponseDTO> createUser(@RequestBody UserDto userDto) {
         UserResponseDTO newUser = userService.createUser(userDto);
@@ -36,12 +42,18 @@ public class UserController {
         return ResponseEntity.ok(newUser);
     }
 
+    @Operation(summary = "Authenticate a user")
+    @ApiResponse(responseCode = "200", description = "Returns an AuthResponseDTO")
+    @ApiResponse(responseCode = "401", description = "Unauthorized")
     @PostMapping("/auth")
     public ResponseEntity<AuthResponseDTO> authUser(@RequestBody UserDto userDto) {
         AuthResponseDTO response = userService.authUser(userDto);
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "Get user by id")
+    @ApiResponse(responseCode = "200", description = "Returns a UserDTO")
+    @ApiResponse(responseCode = "404", description = "Not found")
     @GetMapping("/{userId}")
     public ResponseEntity<User> getUserById(@PathVariable String userId) {
         Optional<User> user = userService.findUserById(userId);
@@ -54,6 +66,9 @@ public class UserController {
 
     }
 
+    @Operation(summary = "Get user orders")
+    @ApiResponse(responseCode = "200", description = "Returns a list of orders")
+    @ApiResponse(responseCode = "409", description = "User not found")
     @GetMapping("/orders")
     public ResponseEntity<List<Order>> getUserOrders() {
         List<Order> order = orderService.getUserOrders();
