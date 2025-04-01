@@ -59,7 +59,6 @@ public class OrderService {
         userOrder.setCustomerId(userOrdering.getId());
         userOrder.setOrder_date(orderDto.getOrder_date());
         userOrder.setQuantity(orderDto.getQuantity());
-        userOrder.setId(orderDto.getId());
 
         Order prevOrder = orderRepository.save(userOrder);
 
