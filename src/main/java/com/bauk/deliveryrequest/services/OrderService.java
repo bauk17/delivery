@@ -46,7 +46,6 @@ public class OrderService {
     public OrderDto createOrder(OrderDto orderDto) {
 
         String user = securityUtil.getAuthenticatedUsername();
-        System.out.print(user);
         User findUser = userRepository.findByNameOrEmail(user, user);
 
         if (findUser == null) {
