@@ -14,7 +14,6 @@ public class OrderDto {
         this.costumerId = null;
         this.quantity = null;
         this.order_date = null;
-        this.id = null;
     }
 
     public OrderDto(Order obj) {
