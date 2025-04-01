@@ -25,6 +25,7 @@ import com.bauk.deliveryrequest.services.OrderService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
@@ -40,6 +41,7 @@ public class OrderController {
     @Operation(summary = "Create a new order")
     @ApiResponse(responseCode = "200", description = "Returns an OrderDto")
     @ApiResponse(responseCode = "409", description = "User not found")
+    @SecurityRequirement(name = "BearerAuth")
     @PostMapping
     public ResponseEntity<OrderDto> createOrder(@RequestBody OrderDto orderDto) {
         OrderDto newOrder = orderService.createOrder(orderDto);
@@ -48,6 +50,7 @@ public class OrderController {
 
     @Operation(summary = "Get all orders")
     @ApiResponse(responseCode = "200", description = "Returns a list of Orders")
+    @SecurityRequirement(name = "BearerAuth")
     @GetMapping
     public ResponseEntity<List<Order>> findAllOrders() {
         return ResponseEntity.ok(orderRepository.findAll());
@@ -56,6 +59,7 @@ public class OrderController {
     @Operation(summary = "Get an order by id")
     @ApiResponse(responseCode = "200", description = "Returns an Order")
     @ApiResponse(responseCode = "404", description = "Order not found")
+    @SecurityRequirement(name = "BearerAuth")
     @GetMapping("/{orderId}")
     public ResponseEntity<Order> findOrder(@PathVariable String orderId) {
         Optional<Order> order = orderService.findOrderById(orderId);
@@ -70,6 +74,7 @@ public class OrderController {
     @ApiResponse(responseCode = "200", description = "Returns an Order")
     @ApiResponse(responseCode = "404", description = "Order not found")
     @PatchMapping("/{orderId}/status")
+    @SecurityRequirement(name = "BearerAuth")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Order> updateOrder(@PathVariable String orderId, @RequestBody StatusUpdateRequest status)
             throws AccessDeniedException {
@@ -85,6 +90,7 @@ public class OrderController {
     @Operation(summary = "Delete an order")
     @ApiResponse(responseCode = "204", description = "No content")
     @ApiResponse(responseCode = "404", description = "Order not found with id {orderId}")
+    @SecurityRequirement(name = "BearerAuth")
     @DeleteMapping("/{orderId}")
     public ResponseEntity<Void> deleteOrder(@PathVariable String orderId) {
         orderService.deleteOrder(orderId);
