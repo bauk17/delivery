@@ -35,8 +35,12 @@ public class UserService {
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
 
-    public Optional<User> findUserById(String id) {
-        return userRepository.findById(id);
+    public UserResponseDTO findUserById(String id) {
+        Optional<User> user = userRepository.findById(id);
+        if (user.isEmpty()) {
+            throw new ObjectAlreadyExistsException("User not found");
+        }
+        return new UserResponseDTO(user.get());
     }
 
     public User findUserByUsernameOrEmail(String nameOrEmail) {
@@ -52,7 +56,6 @@ public class UserService {
         user.setEmail(userDto.getEmail());
         user.setName(userDto.getName());
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
-        user.setId(userDto.getId());
 
         User savedUser = userRepository.save(user);
 
